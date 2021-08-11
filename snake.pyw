@@ -5,6 +5,17 @@ import time
 import random
 
 
+class Config:
+	"""
+	Use this class as configuration for the game.
+	"""
+	def __init__(self):
+		self.BACKGROUND_COLOUR = "#212121"
+		self.SNAKE_BODY_COLOUR = "#ffff00"
+		self.FOOD_COLOUR = "#ff0000"
+		self.TIME_BETWEEN_UPDATES = 150
+
+
 class InputControl(Enum):
 	"""
 	Enum class which contains all the directions for the game, this used for the direction
@@ -32,16 +43,17 @@ class Snake():
 		self.root.rowconfigure(1, weight=1)
 		self.root.columnconfigure(0, weight=1)
 
-		self.TIME_BETWEEN_UPDATES = 150
+		config = Config()
+		
+		self.TIME_BETWEEN_UPDATES = config.TIME_BETWEEN_UPDATES
 		self.gamePaused = False
 		self.score = tk.IntVar(self.root)
 		self.timeStart = time.time()
 		self.timePlayed = 0
 		self.gameLose = False
-		self.backgroundColour = "#212121"
-		self.snakeBodyColour = "#ffff00"
-		if self.snakeBodyColour == "#ff0000":
-			raise RuntimeError("Cannot have snake colour same as food colour.")
+		self.backgroundColour = config.BACKGROUND_COLOUR
+		self.snakeBodyColour = config.SNAKE_BODY_COLOUR
+		self.foodColour = config.FOOD_COLOUR
 
 		# Game widgets and scores
 		self.gameBoard = tk.Frame(self.root, bg=self.backgroundColour)
@@ -103,7 +115,7 @@ class Snake():
 		for i in range(9, 13):
 			self.gridColumns[i][7].config(bg=self.snakeBodyColour)
 
-		self.gridColumns[self.foodCoords[0]][self.foodCoords[1]].config(bg="#ff0000")
+		self.gridColumns[self.foodCoords[0]][self.foodCoords[1]].config(bg=self.foodColour)
 
 
 	def generate_food(self):
@@ -117,7 +129,7 @@ class Snake():
 			self.foodCoords[1] = random.randint(0, 14)
 
 			if (self.gridColumns[self.foodCoords[0]][self.foodCoords[1]].cget("bg") == self.backgroundColour):
-				self.gridColumns[self.foodCoords[0]][self.foodCoords[1]].config(bg="#ff0000")
+				self.gridColumns[self.foodCoords[0]][self.foodCoords[1]].config(bg=self.foodColour)
 				foodIsInEmptySpace = True
 
 
@@ -159,7 +171,7 @@ class Snake():
 			self.game_lose_event()
 			return
 
-		if (self.gridColumns[self.snakeBody[0][0]][self.snakeBody[0][1]].cget("bg") == "#ff0000"):
+		if (self.gridColumns[self.snakeBody[0][0]][self.snakeBody[0][1]].cget("bg") == self.foodColour):
 			self.gridColumns[self.snakeBody[-1][0]][self.snakeBody[-1][1]].config(bg=self.snakeBodyColour)
 			self.score.set(self.score.get() + 1)
 			self.scoreCard.config(text=self.score)
